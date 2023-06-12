@@ -106,7 +106,7 @@ services:
       - 'ELASTICSEARCH_HOSTS=http://elastic-exchange:9201'
       - 'ELASTICSEARCH_USERNAME=elastic'
       - 'ELASTICSEARCH_PASSWORD=iojhA;SOD*A&dya8dasdjad89YAD'
-      - 'SERVER_PUBLICBASEURL=http://95.217.35.55:5602'
+      - 'SERVER_PUBLICBASEURL=http://65.109.10.128:5602'
       - 'SERVER_COMPRESSION_ENABLED=true'
       - 'SERVER_PORT=5602'
 networks:
