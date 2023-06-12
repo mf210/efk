@@ -3,33 +3,33 @@ volumes:
   esdata2: null
 
 services:
-  logstash:
-    image: docker.elastic.co/logstash/logstash-oss:6.2.2
-    restart: always
-    volumes:
-      - ./logstash/pipelines.yaml:/usr/share/logstash/config/pipelines.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-      - ./logstash-data:/usr/share/logstash/data/
-    ports:
-      #- '24220:24220'
-      #- '24220:24220/udp'
-      - '24225:24225'
-      - '24225:24225/udp'
-      - '24229:24229'
-      - '24229:24229/udp'
-    logging:
-      driver: "json-file"
-      options:
-         max-size: "5000m"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - internal
-      #- proxy
-    depends_on:
-      - elasticsearch
-    links:
-      - elasticsearch
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash-oss:6.2.2
+  #   restart: always
+  #   volumes:
+  #     - ./logstash/pipelines.yaml:/usr/share/logstash/config/pipelines.yml:ro
+  #     - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+  #     - ./logstash-data:/usr/share/logstash/data/
+  #   ports:
+  #     #- '24220:24220'
+  #     #- '24220:24220/udp'
+  #     - '24225:24225'
+  #     - '24225:24225/udp'
+  #     - '24229:24229'
+  #     - '24229:24229/udp'
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #        max-size: "5000m"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   networks:
+  #     - internal
+  #     #- proxy
+  #   depends_on:
+  #     - elasticsearch
+  #   links:
+  #     - elasticsearch
   fluentd:
     build: ./fluentd
     restart: always
