@@ -1,0 +1,115 @@
+version: '3'
+volumes:
+  esdata2: null
+
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:6.2.2
+    restart: always
+    volumes:
+      - ./logstash/pipelines.yaml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash-data:/usr/share/logstash/data/
+    ports:
+      #- '24220:24220'
+      #- '24220:24220/udp'
+      - '24225:24225'
+      - '24225:24225/udp'
+      - '24229:24229'
+      - '24229:24229/udp'
+    logging:
+      driver: "json-file"
+      options:
+         max-size: "5000m"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - internal
+      #- proxy
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+  fluentd:
+    build: ./fluentd
+    restart: always
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+    ports:
+       - 24220:24220
+       - 24220:24220/udp
+       #- '24225:24225'
+       #- '24225:24225/udp'
+    volumes:
+       - './fluentd/conf:/fluentd/etc'
+    logging:
+      driver: "json-file"
+      options:
+         max-size: "5000m"
+    networks:
+      - internal
+      #- proxy
+    #labels:
+      #- "traefik.enable=true"
+      #- "traefik.docker.network=proxy"
+      #- "traefik.http.routers.fluentd.rule=PathPrefix(`/fluentd`)"
+      #- "traefik.http.routers.fluentd.entrypoints:web"
+      #- "traefik.http.services.fluentd.loadbalancer.server.port:24224"
+  elasticsearch:
+    container_name: elastic-exchange
+    image: 'elasticsearch:7.17.0'
+    restart: always
+    expose:
+      - 9201
+    networks:
+      - internal
+    environment:
+      - discovery.type=single-node
+      - http.port=9201
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - ELASTIC_PASSWORD=iojhA;SOD*A&dya8dasdjad89YAD
+      - xpack.security.enabled=true
+    logging:
+      driver: "json-file"
+      options:
+         max-size: "5000m"
+    volumes:
+      - 'esdata2:/usr/share/elasticsearch/data'
+      #- './esdata/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
+  kibana:
+    image: 'kibana:7.17.0'
+    restart: always
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+ #   volumes:
+#      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    logging:
+      driver: "json-file"
+      options:
+         max-size: "5000m"
+    networks:
+      - internal
+      #- proxy
+    #labels:
+      #- "traefik.enable=true"
+      #- "traefik.docker.network=proxy"
+      #- "traefki.http.routers.kibana.rule=PathPrefix(`/kibana`)"
+      #- "traefik.http.routers.kibana.entrypoints:web"
+      #- "traefik.http.services.kibana.loadbalancer.server.port:5601"
+    ports:
+       - '5602:5602'
+    environment:
+      - 'ELASTICSEARCH_HOSTS=http://elastic-exchange:9201'
+      - 'ELASTICSEARCH_USERNAME=elastic'
+      - 'ELASTICSEARCH_PASSWORD=iojhA;SOD*A&dya8dasdjad89YAD'
+      - 'SERVER_PUBLICBASEURL=http://95.217.35.55:5602'
+      - 'SERVER_COMPRESSION_ENABLED=true'
+      - 'SERVER_PORT=5602'
+networks:
+  #proxy:
+    #external: true
+  internal:

@@ -1,0 +1,34 @@
+<source>
+  @type forward
+  @label exchange
+  port 24220
+  bind 0.0.0.0
+</source>
+
+# sendlog to the elasticsearch
+# the host must match to the elasticsearch
+# container service
+
+<label exchange>
+  <match *.**>
+    @type copy
+    <store>
+      @type elasticsearch
+      host elastic-exchange
+      port 9201
+      user elastic
+      password iojhA;SOD*A&dya8dasdjad89YAD 
+      logstash_format true
+      logstash_prefix exchange-socket
+      logstash_dateformat %Y%m%d
+      include_tag_key true
+      type_name access_log
+      tag_key @exchange-socket
+      flush_interval 1s
+    </store>
+    <store>
+      @type stdout
+    </store>
+  </match>
+</label>
+
